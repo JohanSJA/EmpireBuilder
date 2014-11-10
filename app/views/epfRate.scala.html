@@ -1,0 +1,12 @@
+@(wages: Double, rate: Rate)
+
+@main(s"Rate for $wages") {
+  <dl>
+    <dt>Wages</dt>
+    <dd>@wages</dd>
+    <dt>Contribution by Employer</dt>
+    <dd>@rate.contributionEmployer</dd>
+    <dt>Contribution by Employee</dt>
+    <dd>@rate.contributionEmployee</dd>
+  </dl>
+}

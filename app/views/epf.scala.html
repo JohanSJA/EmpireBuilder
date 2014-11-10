@@ -1,0 +1,10 @@
+@(parts: List[Part])
+
+@main("EPF List") {
+
+  @for(p <- parts) {
+    <h1>@p.name</h1>
+    <p>@p.description</p>
+  }
+
+}
