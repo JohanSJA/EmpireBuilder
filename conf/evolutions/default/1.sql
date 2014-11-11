@@ -4,10 +4,8 @@
 # --- !Ups
 
 create table "PARTS" ("name" VARCHAR NOT NULL PRIMARY KEY,"description" VARCHAR NOT NULL);
-create table "RATES" ("partName" VARCHAR NOT NULL,"wagesTo" DOUBLE NOT NULL,"contributionEmployer" DOUBLE,"contributionEmployee" DOUBLE);
 
 # --- !Downs
 
-drop table "RATES";
 drop table "PARTS";
 

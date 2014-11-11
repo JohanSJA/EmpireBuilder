@@ -4,15 +4,19 @@
   <h1>Part @part.name</h1>
   <table>
     <tr>
+      <th>Wages From</th>
       <th>Wages To</th>
       <th>Contribution By Employer</th>
       <th>Contribution By Employee</th>
+      <th>Total Contribution</th>
     </tr>
     @for(r <- rates) {
       <tr>
+        <td>@r.wagesFrom</td>
         <td>@r.wagesTo</td>
         <td>@r.contributionEmployer.getOrElse("-")</td>
         <td>@r.contributionEmployee.getOrElse("-")</td>
+        <td>@r.contributionTotal.getOrElse("-")</td>
       </tr>
     }
   </table>
