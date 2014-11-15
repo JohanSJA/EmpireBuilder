@@ -11,5 +11,7 @@ libraryDependencies ++= Seq(
   anorm,
   cache,
   ws,
-  "com.typesafe.play" %% "play-slick" % "0.8.0"
+  "com.typesafe.play" %% "play-slick" % "0.8.0",
+  "org.webjars" % "bootstrap" % "3.3.1",
+  "com.adrianhurt" %% "play-bootstrap3" % "0.1.1"
 )

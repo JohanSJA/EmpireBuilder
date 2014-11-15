@@ -1,14 +1,96 @@
 package models
 
-import play.api.db.slick.Config.driver.simple._
-
 case class Part(name: String, description: String)
 
-class Parts(tag: Tag) extends Table[Part](tag, "PARTS") {
-  def name = column[String]("name", O.PrimaryKey)
-  def description = column[String]("description")
-
-  def * = (name, description) <> (Part.tupled, Part.unapply _)
+object Parts {
+  def list(): List[Part] = {
+    val partADesc = """
+    <ol>
+      <li>
+        The rate of monthly contributions specified in this Part shall apply to:-
+        <ol type="a">
+          <li>employees who are Malaysian citizens;</li>
+          <li>employees who are not Malaysian citizens but are permanent residents of Malaysia; and</li>
+          <li>employees who are not Malaysian citizens who have elected to contribute before 1 August 1998.</li>
+        </ol>
+        until the the employee reached the age of sixty years
+      </li>
+      <li>
+        In this Part:-
+        <ol type="a">
+          <li>the amount of wages for the month which shall be contributd to the Fund by each employer for each employee shall be according to any limit on the amount of wages and contributions as prescribed by the Board; and</li>
+          <li>the amount of contributions for the month for the purpose of subsection 43(3) and section 44A is limited to any limit on the total contributions as prescribed by the Board.</li>
+        </ol>
+      </li>
+    </ol>
+    """
+    val partA = Part("A", partADesc)
+    val partBDesc = """
+    <ol>
+      <li>
+        The rate of monthly contributions specified in this Part shall apply to employees who are not Malaysian citizens:-
+        <ol type="a">
+          <li>who elect to contribute on or after 1 August 1998;</li>
+          <li>who elect to contribute under subsection 54(3) on or after 1 August 1998; and</li>
+          <li>who elect to contribute under paragraph 6 of the First Schedule on or after 1 August 2001.</li>
+        </ol>
+        until the the employee reached the age of sixty years
+      </li>
+      <li>
+        In this Part:-
+        <ol type="a">
+          <li>the amount of wages for the month which shall be contributd to the Fund by each employer for each employee shall be according to any limit on the amount of wages and contributions as prescribed by the Board; and
+          <li>the amount of contributions for the month for the purpose of subsection 43(3) and section 44A is limited to any limit on the total contributions as prescribed by the Board.
+        </ol>
+      </li>
+    </ol>
+    """
+    val partB = Part("B", partBDesc)
+    val partCDesc = """
+    <ol>
+      <li>
+        The rate of monthly contributions specified in this Part shall apply to:-
+        <ol type="a">
+          <li>employees who are Malaysian citizens;</li>
+          <li>employees who are not Malaysian citizens but are permanent residents of Malaysia; and</li>
+          <li>employees who are not Malaysian citizens who have elected to contribute before 1 August 1998.</li>
+        </ol>
+        who have attained the age of sixty years.
+      </li>
+      <li>
+        In this Part:-
+        <ol type="a">
+          <li>the amount of wages for the month which shall be contributd to the Fund by each employer for each employee shall be according to any limit on the amount of wages and contributions as prescribed by the Board; and
+          <li>the amount of contributions for the month for the purpose of subsection 43(3) and section 44A is limited to any limit on the total contributions as prescribed by the Board.
+        </ol>
+      </li>
+    </ol>
+    """
+    val partC = Part("C", partCDesc)
+    val partDDesc = """
+    <ol>
+      <li>
+        The rate of monthly contributions specified in this Part shall apply to employees who are not Malaysian citizens:-
+        <ol type="a">
+          <li>who elect to contribute on or after 1 August 1998;</li>
+          <li>who elect to contribute under subsection 54(3) on or after 1 August 1998; and</li>
+          <li>who elect to contribute under paragraph 3 of the First Schedule on or after 1 August 1998; and</li>
+          <li>who elect to contribute under paragraph 6 of the First Schedule on or after 1 August 2001.</li>
+        </ol>
+        who have attained the arge of sixty years.
+      </li>
+      <li>
+        In this Part:-
+        <ol type="a">
+          <li>the amount of wages for the month which shall be contributd to the Fund by each employer for each employee shall be according to any limit on the amount of wages and contributions as prescribed by the Board; and
+          <li>the amount of contributions for the month for the purpose of subsection 43(3) and section 44A is limited to any limit on the total contributions as prescribed by the Board.
+        </ol>
+      </li>
+    </ol>
+    """
+    val partD = Part("D", partDDesc)
+    List(partA, partB, partC, partD)
+  }
 }
 
 case class Rate(partName: String, wagesFrom: Double, wagesTo: Double,

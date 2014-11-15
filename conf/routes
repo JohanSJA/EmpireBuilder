@@ -10,5 +10,6 @@ GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 # EPF related
 GET     /epf                        controllers.Epf.index
+POST    /epf                        controllers.Epf.check
 GET     /epf/:part                  controllers.Epf.part(part)
 GET     /epf/:part/:wages           controllers.Epf.rate(part, wages: Double)
