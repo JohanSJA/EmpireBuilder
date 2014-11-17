@@ -1,5 +1,7 @@
 package models
 
+case class EmployeeInfo(citizenship: String, dateOfBirth: Date, wages: BigDecimal)
+
 case class Part(name: String, description: String)
 
 object Parts {
@@ -25,6 +27,7 @@ object Parts {
     </ol>
     """
     val partA = Part("A", partADesc)
+
     val partBDesc = """
     <ol>
       <li>
@@ -46,6 +49,7 @@ object Parts {
     </ol>
     """
     val partB = Part("B", partBDesc)
+
     val partCDesc = """
     <ol>
       <li>
@@ -67,6 +71,7 @@ object Parts {
     </ol>
     """
     val partC = Part("C", partCDesc)
+
     val partDDesc = """
     <ol>
       <li>
@@ -89,12 +94,20 @@ object Parts {
     </ol>
     """
     val partD = Part("D", partDDesc)
+
     List(partA, partB, partC, partD)
+  }
+
+  def get(name: String): Option[Part] = {
+    val parts = list()
+    val part = parts.filter(_.name == name)
+    if (part isDefinedAt 0) Some(part(0)) else None
   }
 }
 
+
 case class Rate(partName: String, wagesFrom: Double, wagesTo: Double,
-                contributionEmployer: Option[Double], contributionEmployee: Option[Double]) {
+  contributionEmployer: Option[Double], contributionEmployee: Option[Double]) {
   def contributionTotal() = {
     val employer = contributionEmployer.getOrElse(0.0)
     val employee = contributionEmployee.getOrElse(0.0)
@@ -105,68 +118,88 @@ case class Rate(partName: String, wagesFrom: Double, wagesTo: Double,
 }
 
 object Rates {
-  def list(partName: String) = {
-    val rates10 = Rate(partName, 0.01, 10, None, None)
-    partName match {
-      case "A" =>
-        val rates5k = (20.to(5000, 20)) map { w =>
-          val from = if (w == 20) w - 9.99 else w - 19.99
-          val employer = (w * 0.13).ceil
-          val employee = (w * 0.11).ceil
-          Rate(partName, from, w, Some(employer), Some(employee))
-        }
-        val rates20k = (5100.to(20000, 100)) map { w =>
-          val from = w - 99.99
-          val employer = (w * 0.12).ceil
-          val employee = (w * 0.11).ceil
-          Rate(partName, from, w, Some(employer), Some(employee))
-        }
-        rates10 :: rates5k.toList ::: rates20k.toList
-
-      case "B" =>
-        val employer = 5
-        val rates5k = (20.to(5000, 20)) map { w =>
-          val from = if (w == 20) w - 9.99 else w - 19.99
-          val employee = (w * 0.11).ceil
-          Rate(partName, from, w, Some(employer), Some(employee))
-        }
-        val rates20k = (5100.to(20000, 100)) map { w =>
-          val from = w - 99.99
-          val employee = (w * 0.11).ceil
-          Rate(partName, from, w, Some(employer), Some(employee))
-        }
-        rates10 :: rates5k.toList ::: rates20k.toList
-
-      case "C" =>
-        val rates5k = (20.to(5000, 20)) map { w =>
-          val from = if (w == 20) w - 9.99 else w - 19.99
-          val employer = (w * 0.065).ceil
-          val employee = (w * 0.055).ceil
-          Rate(partName, from, w, Some(employer), Some(employee))
-        }
-        val rates20k = (5100.to(20000, 100)) map { w =>
-          val from = w - 99.99
-          val employer = (w * 0.060).ceil
-          val employee = (w * 0.055).ceil
-          Rate(partName, from, w, Some(employer), Some(employee))
-        }
-        rates10 :: rates5k.toList ::: rates20k.toList
-
-      case "D" =>
-        val employer = 5
-        val rates5k = (20.to(5000, 20)) map { w =>
-          val from = if (w == 20) w - 9.99 else w - 19.99
-          val employee = (w * 0.055).ceil
-          Rate(partName, from, w, Some(employer), Some(employee))
-        }
-        val rates20k = (5100.to(20000, 100)) map { w =>
-          val from = w - 99.99
-          val employee = (w * 0.055).ceil
-          Rate(partName, from, w, Some(employer), Some(employee))
-        }
-        rates10 :: rates5k.toList ::: rates20k.toList
-
-      case _ => List[Rate]()
+  def list(): List[Rate] = {
+    val listA = {
+      val partName = "A"
+      val rates10 = Rate(partName, 0.01, 10, None, None)
+      val rates5k = (20.to(5000, 20)) map { w =>
+        val from = if (w == 20) w - 9.99 else w - 19.99
+        val employer = (w * 0.13).ceil
+        val employee = (w * 0.11).ceil
+        Rate(partName, from, w, Some(employer), Some(employee))
+      }
+      val rates20k = (5100.to(20000, 100)) map { w =>
+        val from = w - 99.99
+        val employer = (w * 0.12).ceil
+        val employee = (w * 0.11).ceil
+        Rate(partName, from, w, Some(employer), Some(employee))
+      }
+      rates10 :: rates5k.toList ::: rates20k.toList
     }
+
+    val listB = {
+      val partName = "B"
+      val employer = 5
+      val rates10 = Rate(partName, 0.01, 10, None, None)
+      val rates5k = (20.to(5000, 20)) map { w =>
+        val from = if (w == 20) w - 9.99 else w - 19.99
+        val employee = (w * 0.11).ceil
+        Rate(partName, from, w, Some(employer), Some(employee))
+      }
+      val rates20k = (5100.to(20000, 100)) map { w =>
+        val from = w - 99.99
+        val employee = (w * 0.11).ceil
+        Rate(partName, from, w, Some(employer), Some(employee))
+      }
+      rates10 :: rates5k.toList ::: rates20k.toList
+    }
+
+    val listC = {
+      val partName = "C"
+      val rates10 = Rate(partName, 0.01, 10, None, None)
+      val rates5k = (20.to(5000, 20)) map { w =>
+        val from = if (w == 20) w - 9.99 else w - 19.99
+        val employer = (w * 0.065).ceil
+        val employee = (w * 0.055).ceil
+        Rate(partName, from, w, Some(employer), Some(employee))
+      }
+      val rates20k = (5100.to(20000, 100)) map { w =>
+        val from = w - 99.99
+        val employer = (w * 0.060).ceil
+        val employee = (w * 0.055).ceil
+        Rate(partName, from, w, Some(employer), Some(employee))
+      }
+      rates10 :: rates5k.toList ::: rates20k.toList
+    }
+
+    val listD = {
+      val partName = "D"
+      val employer = 5
+      val rates10 = Rate(partName, 0.01, 10, None, None)
+      val rates5k = (20.to(5000, 20)) map { w =>
+        val from = if (w == 20) w - 9.99 else w - 19.99
+        val employee = (w * 0.055).ceil
+        Rate(partName, from, w, Some(employer), Some(employee))
+      }
+      val rates20k = (5100.to(20000, 100)) map { w =>
+        val from = w - 99.99
+        val employee = (w * 0.055).ceil
+        Rate(partName, from, w, Some(employer), Some(employee))
+      }
+      rates10 :: rates5k.toList ::: rates20k.toList
+    }
+
+    listA ::: listB ::: listC ::: listD
+  }
+
+  def list(partName: String): List[Rate] = {
+    val all = list()
+    all.filter(_.partName == partName)
+  }
+
+  def get(partName: String, wages: Double): Option[Rate] = {
+    val all = list(partName)
+    val filtered = all.filter(_.wagesFrom <= wages).filter(_.wagesTo >= wages)
+    if (filtered isDefinedAt 0) Some(filtered(0)) else None
   }
 }

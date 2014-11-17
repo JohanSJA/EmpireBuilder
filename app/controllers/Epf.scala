@@ -10,14 +10,12 @@ import play.api.mvc._
 
 import models._
 
-case class EmployeeInfo(dateOfBirth: Date, citizenship: String, wages: BigDecimal)
-
 object Epf extends Controller {
 
   val infoForm = Form(
     mapping(
-      "dateOfBirth" -> date,
       "citizenship" -> nonEmptyText,
+      "dateOfBirth" -> date,
       "wages" -> bigDecimal(precision = 20, scale = 2)
     )(EmployeeInfo.apply)(EmployeeInfo.unapply)
   )
@@ -34,9 +32,9 @@ object Epf extends Controller {
       },
       info => {
         info match {
-          case EmployeeInfo(dob, "M", wages) =>
+          case EmployeeInfo("M", dob, wages) =>
             Redirect(routes.Epf.rate("A", info.wages.toDouble))
-          case EmployeeInfo(dob, "O", wages) =>
+          case EmployeeInfo("O", dob, wages) =>
             Redirect(routes.Epf.rate("B", info.wages.toDouble))
           case _ => Redirect(routes.Epf.rate("D", info.wages.toDouble))
         }
@@ -45,25 +43,29 @@ object Epf extends Controller {
   }
 
   def part(partName: String) = DBAction { implicit rs =>
-    try {
-      val partInfo = Parts.list.filter(_.name == partName)(0)
-      val partRates = Rates.list(partName)
-      Ok(views.html.epfPart(partInfo, partRates))
-    } catch {
-      case e: NoSuchElementException =>
-        NotFound("Unknown part")
+    val partInfo = Parts.get(partName)
+    val partRates = Rates.list(partName)
+    val result = partInfo map { p => Ok(views.html.epfPart(p, partRates)) }
+    result getOrElse {
+      val partInfo = Part(partName, "This is an unknown part.")
+      NotFound(views.html.epfPart(partInfo, partRates))
     }
   }
 
   def rate(part: String, wages: Double) = DBAction { implicit rs =>
-    try {
-      val partInfo = Parts.list.filter(_.name == part)(0)
-      val rates = Rates.list(part)
-      val rateInfo = rates.filter(r => r.wagesFrom <= wages && r.wagesTo >= wages)(0)
-      Ok(views.html.epfRate(wages, partInfo, rateInfo))
-    } catch {
-      case e: IndexOutOfBoundsException =>
-        Ok(s"Unknown rate for $wages")
+    val partInfo = Parts.get(part)
+    val result = partInfo map { p =>
+      val rateInfo = Rates.get(part, wages)
+      val result = rateInfo map { r => Ok(views.html.epfRate(wages, p, r)) }
+      result getOrElse {
+        val rateInfo = Rate(p.name, wages, wages, None, None)
+        NotFound(views.html.epfRate(wages, p, rateInfo))
+      }
+    }
+    result getOrElse {
+      val partInfo = Part(part, "This is an unknown part.")
+      val rateInfo = Rate(part, wages, wages, None, None)
+      NotFound(views.html.epfRate(wages, partInfo, rateInfo))
     }
   }
 
