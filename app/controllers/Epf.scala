@@ -1,6 +1,5 @@
 package controllers
 
-import java.util.Date
 import play.api._
 import play.api.data._
 import play.api.data.Forms._
@@ -15,11 +14,13 @@ object Epf extends Controller {
   val infoForm = Form(
     mapping(
       "citizenship" -> nonEmptyText,
-      "dateOfBirth" -> date,
+      "dateOfBirth" -> jodaLocalDate,
       "wages" -> bigDecimal(precision = 20, scale = 2)
     )(EmployeeInfo.apply)(EmployeeInfo.unapply)
   )
-  val citizenships = Seq("M" -> "Malaysian", "PR" -> "Permanent Resident", "O" -> "Others")
+  val citizenships = Seq("M" -> "Malaysian",
+    "PR" -> "Permanent Resident",
+    "O" -> "Others")
 
   def index() = DBAction { implicit rs =>
     Ok(views.html.epf(infoForm, citizenships, Parts.list))
@@ -31,12 +32,11 @@ object Epf extends Controller {
         BadRequest(views.html.epf(formWithErrors, citizenships, Parts.list))
       },
       info => {
-        info match {
-          case EmployeeInfo("M", dob, wages) =>
-            Redirect(routes.Epf.rate("A", info.wages.toDouble))
-          case EmployeeInfo("O", dob, wages) =>
-            Redirect(routes.Epf.rate("B", info.wages.toDouble))
-          case _ => Redirect(routes.Epf.rate("D", info.wages.toDouble))
+        val part = Parts.get(info)
+        part map { p =>
+          Redirect(routes.Epf.rate(p.name, info.wages.toDouble))
+        } getOrElse {
+          Redirect(routes.Epf.rate("E", info.wages.toDouble))
         }
       }
     )

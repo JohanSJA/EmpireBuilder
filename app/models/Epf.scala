@@ -1,6 +1,11 @@
 package models
 
-case class EmployeeInfo(citizenship: String, dateOfBirth: Date, wages: BigDecimal)
+import org.joda.time.{ LocalDate, Years }
+
+case class EmployeeInfo(citizenship: String, dateOfBirth: LocalDate, wages: BigDecimal) {
+  val now = new LocalDate()
+  val age = Years.yearsBetween(dateOfBirth, now).getYears()
+}
 
 case class Part(name: String, description: String)
 
@@ -102,6 +107,14 @@ object Parts {
     val parts = list()
     val part = parts.filter(_.name == name)
     if (part isDefinedAt 0) Some(part(0)) else None
+  }
+
+  def get(emp: EmployeeInfo): Option[Part] = {
+    emp match {
+      case EmployeeInfo("M", dob, wages) => get("A")
+      case EmployeeInfo("O", dob, wages) => get("B")
+      case _ => get("D")
+    }
   }
 }
 
