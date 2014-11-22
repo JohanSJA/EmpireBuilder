@@ -2,7 +2,8 @@ package models
 
 import org.joda.time.{ LocalDate, Years }
 
-case class EmployeeInfo(citizenship: String, dateOfBirth: LocalDate, wages: BigDecimal) {
+case class EmployeeInfo(citizenship: String, contributeBefore1August1998: Boolean,
+    dateOfBirth: LocalDate, wages: BigDecimal) {
   val now = new LocalDate()
   val age = Years.yearsBetween(dateOfBirth, now).getYears()
 }
@@ -111,9 +112,14 @@ object Parts {
 
   def get(emp: EmployeeInfo): Option[Part] = {
     emp match {
-      case EmployeeInfo("M", dob, wages) => get("A")
-      case EmployeeInfo("O", dob, wages) => get("B")
-      case _ => get("D")
+      case EmployeeInfo("M" | "PR", contributeBefore1August1998, dob, wages) =>
+        if (emp.age < 60) get("A") else get("C")
+
+      case EmployeeInfo("O", true, dob, wages) =>
+        if (emp.age < 60) get("A") else get("C")
+
+      case EmployeeInfo("O", false, dob, wages) =>
+        if (emp.age < 60) get("B") else get("D")
     }
   }
 }
@@ -132,9 +138,10 @@ case class Rate(partName: String, wagesFrom: Double, wagesTo: Double,
 
 object Rates {
   def list(): List[Rate] = {
+    def rates10(partName: String) = Rate(partName, 0.01, 10, None, None)
+
     val listA = {
       val partName = "A"
-      val rates10 = Rate(partName, 0.01, 10, None, None)
       val rates5k = (20.to(5000, 20)) map { w =>
         val from = if (w == 20) w - 9.99 else w - 19.99
         val employer = (w * 0.13).ceil
@@ -147,13 +154,12 @@ object Rates {
         val employee = (w * 0.11).ceil
         Rate(partName, from, w, Some(employer), Some(employee))
       }
-      rates10 :: rates5k.toList ::: rates20k.toList
+      rates10(partName) :: rates5k.toList ::: rates20k.toList
     }
 
     val listB = {
       val partName = "B"
       val employer = 5
-      val rates10 = Rate(partName, 0.01, 10, None, None)
       val rates5k = (20.to(5000, 20)) map { w =>
         val from = if (w == 20) w - 9.99 else w - 19.99
         val employee = (w * 0.11).ceil
@@ -164,12 +170,11 @@ object Rates {
         val employee = (w * 0.11).ceil
         Rate(partName, from, w, Some(employer), Some(employee))
       }
-      rates10 :: rates5k.toList ::: rates20k.toList
+      rates10(partName) :: rates5k.toList ::: rates20k.toList
     }
 
     val listC = {
       val partName = "C"
-      val rates10 = Rate(partName, 0.01, 10, None, None)
       val rates5k = (20.to(5000, 20)) map { w =>
         val from = if (w == 20) w - 9.99 else w - 19.99
         val employer = (w * 0.065).ceil
@@ -182,13 +187,12 @@ object Rates {
         val employee = (w * 0.055).ceil
         Rate(partName, from, w, Some(employer), Some(employee))
       }
-      rates10 :: rates5k.toList ::: rates20k.toList
+      rates10(partName) :: rates5k.toList ::: rates20k.toList
     }
 
     val listD = {
       val partName = "D"
       val employer = 5
-      val rates10 = Rate(partName, 0.01, 10, None, None)
       val rates5k = (20.to(5000, 20)) map { w =>
         val from = if (w == 20) w - 9.99 else w - 19.99
         val employee = (w * 0.055).ceil
@@ -199,7 +203,7 @@ object Rates {
         val employee = (w * 0.055).ceil
         Rate(partName, from, w, Some(employer), Some(employee))
       }
-      rates10 :: rates5k.toList ::: rates20k.toList
+      rates10(partName) :: rates5k.toList ::: rates20k.toList
     }
 
     listA ::: listB ::: listC ::: listD
@@ -212,7 +216,20 @@ object Rates {
 
   def get(partName: String, wages: Double): Option[Rate] = {
     val all = list(partName)
-    val filtered = all.filter(_.wagesFrom <= wages).filter(_.wagesTo >= wages)
-    if (filtered isDefinedAt 0) Some(filtered(0)) else None
+    if (wages <= 20000) {
+      val filtered = all.filter(_.wagesFrom <= wages).filter(_.wagesTo >= wages)
+      if (filtered isDefinedAt 0) Some(filtered(0)) else None
+    } else {
+      val wagesFrom = 20000.01
+      val wagesTo = Double.MaxValue
+      val (employer: Double, employee: Double) = partName match {
+        case "A" => ((wages * 0.12).ceil, (wages * 0.11).ceil)
+        case "B" => (5, (wages * 0.11).ceil)
+        case "C" => ((wages * 0.060).ceil, (wages * 0.055).ceil)
+        case "D" => (5, (wages * 0.055).ceil)
+        case _ => (0.0, 0.0)
+      }
+      Some(Rate(partName, wagesFrom, wagesTo, Some(employer), Some(employee)))
+    }
   }
 }

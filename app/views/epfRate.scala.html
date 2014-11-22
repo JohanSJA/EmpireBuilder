@@ -4,19 +4,28 @@
   <div class="container">
     <div class="row">
       <div class="col-md-12">
+        <div class="page-header">
+          <h1>
+            Rate for @(f"$wages%.2f") in
+            Part <a href="@routes.Epf.part(part.name)">@part.name</a>
+          </h1>
+        </div>
+
+        <h2>Wages</h2>
         <dl>
-          <dt>Wages</dt>
-          <dd>@(f"$wages%.2f")</dd>
-          <dt>Part</dt>
-          <dd>@part.name</dd>
-          <dt>Wages From</dt>
+          <dt>From</dt>
           <dd>@(f"${rate.wagesFrom}%.2f")</dd>
-          <dt>Wages To</dt>
+          <dt>To</dt>
           <dd>@(f"${rate.wagesTo}%.2f")</dd>
-          <dt>Contribution by Employer</dt>
+        </dl>
+        <h2>Contribution</h2>
+        <dl>
+          <dt>By Employer</dt>
           <dd>@(f"${rate.contributionEmployer.getOrElse(0.0)}%.2f")</dd>
-          <dt>Contribution by Employee</dt>
+          <dt>By Employee</dt>
           <dd>@(f"${rate.contributionEmployee.getOrElse(0.0)}%.2f")</dd>
+          <dt>Total Contribution</dt>
+          <dd>@(f"${rate.contributionTotal.getOrElse(0.0)}%.2f")</dd>
         </dl>
       </div>
     </div>

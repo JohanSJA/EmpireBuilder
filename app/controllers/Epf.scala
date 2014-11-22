@@ -14,13 +14,14 @@ object Epf extends Controller {
   val infoForm = Form(
     mapping(
       "citizenship" -> nonEmptyText,
+      "contributeBefore1August1998" -> boolean,
       "dateOfBirth" -> jodaLocalDate,
       "wages" -> bigDecimal(precision = 20, scale = 2)
     )(EmployeeInfo.apply)(EmployeeInfo.unapply)
   )
   val citizenships = Seq("M" -> "Malaysian",
-    "PR" -> "Permanent Resident",
-    "O" -> "Others")
+      "PR" -> "Permanent Resident",
+      "O" -> "Others")
 
   def index() = DBAction { implicit rs =>
     Ok(views.html.epf(infoForm, citizenships, Parts.list))
@@ -36,7 +37,7 @@ object Epf extends Controller {
         part map { p =>
           Redirect(routes.Epf.rate(p.name, info.wages.toDouble))
         } getOrElse {
-          Redirect(routes.Epf.rate("E", info.wages.toDouble))
+          Redirect(routes.Epf.rate("Unknown", info.wages.toDouble))
         }
       }
     )
@@ -63,8 +64,8 @@ object Epf extends Controller {
       }
     }
     result getOrElse {
-      val partInfo = Part(part, "This is an unknown part.")
-      val rateInfo = Rate(part, wages, wages, None, None)
+      val partInfo = Part("Unknown", "This is an unknown part.")
+      val rateInfo = Rate("Unknown", wages, wages, None, None)
       NotFound(views.html.epfRate(wages, partInfo, rateInfo))
     }
   }

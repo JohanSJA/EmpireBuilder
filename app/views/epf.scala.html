@@ -17,9 +17,12 @@
         <h2>EPF Checker</h2>
         <h3>Employee Information</h3>
         @b3.form(routes.Epf.check) {
-          @b3.select(infoForm("citizenship"), citizenships)
-          @b3.date(infoForm("dateOfBirth"))
-          @b3.text(infoForm("wages"))
+          @b3.select(infoForm("citizenship"), citizenships,
+              '_label -> "Citizenship")
+          @b3.checkbox(infoForm("contributeBefore1August1998"), '_label -> None,
+              '_text -> "Contribute Before 1 August 1998")
+          @b3.date(infoForm("dateOfBirth"), '_label -> "Date Of Birth")
+          @b3.text(infoForm("wages"), '_label -> "Wages")
           @b3.submit('class -> "btn btn-default"){ Check }
         }
       </div>
